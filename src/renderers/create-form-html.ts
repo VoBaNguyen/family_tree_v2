@@ -236,80 +236,263 @@ function spaceDiv() {
 function avatarUploadScript() {
   return `
     <script>
-      (function() {
-        const fileInput = document.getElementById('avatar-file-input');
-        const urlInput = document.getElementById('avatar-url-input');
+      // Avatar upload utility function attached to window for global access
+      window.setupAvatarUpload = function(container) {
+        console.log('🔧 Setting up avatar upload functionality...');
         
-        if (fileInput) {
-          fileInput.addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            // Validate file type
-            if (!file.type.startsWith('image/')) {
-              alert('Please select a valid image file');
-              return;
-            }
-            
-            // Validate file size (max 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-              alert('File size must be less than 5MB');
-              return;
-            }
-            
-            try {
-              // Create a preview
-              const reader = new FileReader();
-              reader.onload = function(e) {
-                updateAvatarPreview(e.target.result);
-              };
-              reader.readAsDataURL(file);
-              
-              // Upload to server if backend is available
-              if (window.familyTreeManager && typeof window.familyTreeManager.uploadAvatar === 'function') {
-                const uploadedUrl = await window.familyTreeManager.uploadAvatar(file);
-                urlInput.value = uploadedUrl;
-                updateAvatarPreview(uploadedUrl);
-              } else {
-                // Use local file URL as fallback
-                const localUrl = URL.createObjectURL(file);
-                urlInput.value = localUrl;
-                updateAvatarPreview(localUrl);
-              }
-            } catch (error) {
-              console.error('Avatar upload failed:', error);
-              alert('Failed to upload avatar. Please try again.');
-            }
-          });
+        const fileInput = container.querySelector('#avatar-file-input');
+        const urlInput = container.querySelector('#avatar-url-input');
+        
+        if (!fileInput) {
+          console.log('❌ Avatar file input not found in container');
+          return false;
         }
         
+        console.log('✅ Found avatar elements, setting up handlers');
+        
+        // Remove any existing listeners to prevent duplicates
+        const newFileInput = fileInput.cloneNode(true);
+        fileInput.parentNode.replaceChild(newFileInput, fileInput);
+        
+        // Set up file upload handler
+        newFileInput.addEventListener('change', async function(e) {
+          console.log('📁 File selected for avatar upload');
+          const file = e.target.files[0];
+          if (!file) {
+            console.log('❌ No file selected');
+            return;
+          }
+          
+          console.log('📋 File details:', { name: file.name, size: file.size, type: file.type });
+          
+          // Validate file type
+          if (!file.type.startsWith('image/')) {
+            alert('Please select a valid image file');
+            console.log('❌ Invalid file type');
+            return;
+          }
+          
+          // Validate file size (max 5MB)
+          if (file.size > 5 * 1024 * 1024) {
+            alert('File size must be less than 5MB');
+            console.log('❌ File too large');
+            return;
+          }
+          
+          try {
+            console.log('🖼️ Processing file...');
+            
+            // Create immediate preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              console.log('✅ File read, creating preview');
+              window.updateAvatarPreview(container, e.target.result);
+            };
+            reader.readAsDataURL(file);
+            
+            // Try server upload if available
+            if (window.familyTreeManager && typeof window.familyTreeManager.uploadAvatar === 'function') {
+              console.log('� Attempting server upload...');
+              try {
+                const uploadedUrl = await window.familyTreeManager.uploadAvatar(file);
+                const currentUrlInput = container.querySelector('#avatar-url-input');
+                if (currentUrlInput) {
+                  currentUrlInput.value = uploadedUrl;
+                }
+                window.updateAvatarPreview(container, uploadedUrl);
+                console.log('✅ Server upload successful');
+              } catch (uploadError) {
+                console.log('⚠️ Server upload failed, using local preview:', uploadError);
+                const localUrl = URL.createObjectURL(file);
+                const currentUrlInput = container.querySelector('#avatar-url-input');
+                if (currentUrlInput) {
+                  currentUrlInput.value = localUrl;
+                }
+                window.updateAvatarPreview(container, localUrl);
+              }
+            } else {
+              console.log('📷 No server available, using local preview');
+              const localUrl = URL.createObjectURL(file);
+              const currentUrlInput = container.querySelector('#avatar-url-input');
+              if (currentUrlInput) {
+                currentUrlInput.value = localUrl;
+              }
+              window.updateAvatarPreview(container, localUrl);
+            }
+          } catch (error) {
+            console.error('❌ Avatar upload failed:', error);
+            alert('Failed to upload avatar: ' + error.message);
+          }
+        });
+        
+        // Set up URL input handler
         if (urlInput) {
           urlInput.addEventListener('input', function(e) {
             const url = e.target.value;
+            console.log('🔗 URL input changed:', url);
             if (url) {
-              updateAvatarPreview(url);
+              window.updateAvatarPreview(container, url);
             }
           });
         }
         
-        function updateAvatarPreview(src) {
-          const container = document.querySelector('.avatar-upload-container');
-          let preview = container.querySelector('.avatar-preview');
-          
-          if (!preview) {
-            preview = document.createElement('div');
-            preview.className = 'avatar-preview';
-            container.insertBefore(preview, container.firstChild);
-          }
-          
-          preview.innerHTML = '<img src="' + src + '" alt="Avatar preview" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 8px;">';
-          
-          // Update button text
-          const btn = container.querySelector('.avatar-upload-btn');
-          if (btn) {
-            btn.textContent = 'Change Avatar';
-          }
+        console.log('✅ Avatar upload handlers set up successfully!');
+        return true;
+      };
+      
+      window.updateAvatarPreview = function(container, src) {
+        console.log('🖼️ Updating avatar preview with:', src);
+        const avatarContainer = container.querySelector('.avatar-upload-container');
+        if (!avatarContainer) {
+          console.log('❌ Avatar upload container not found');
+          return;
         }
-      })();
+        
+        let preview = avatarContainer.querySelector('.avatar-preview');
+        if (!preview) {
+          console.log('➕ Creating new preview element');
+          preview = document.createElement('div');
+          preview.className = 'avatar-preview';
+          avatarContainer.insertBefore(preview, avatarContainer.firstChild);
+        }
+        
+        preview.innerHTML = '<img src="' + src + '" alt="Avatar preview" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 8px; border: 2px solid #3498db;">';
+        
+        // Update button text
+        const btn = avatarContainer.querySelector('.avatar-upload-btn');
+        if (btn) {
+          btn.textContent = 'Change Avatar';
+          console.log('✅ Updated button text to "Change Avatar"');
+        }
+        
+        console.log('✅ Avatar preview updated successfully');
+      };
+      
+      console.log('📝 Avatar upload utilities attached to window object');
     </script>`;
+}
+
+// Avatar upload utility function that can be called from onFormCreation
+export function setupAvatarUpload(container: HTMLElement) {
+  console.log('🔧 Setting up avatar upload functionality...');
+  
+  const fileInput = container.querySelector('#avatar-file-input') as HTMLInputElement;
+  const urlInput = container.querySelector('#avatar-url-input') as HTMLInputElement;
+  
+  if (!fileInput) {
+    console.log('❌ Avatar file input not found in container');
+    return false;
+  }
+  
+  console.log('✅ Found avatar elements, setting up handlers');
+  
+  // Set up file upload handler
+  fileInput.addEventListener('change', async function(e) {
+    console.log('📁 File selected for avatar upload');
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) {
+      console.log('❌ No file selected');
+      return;
+    }
+    
+    console.log('📋 File details:', { name: file.name, size: file.size, type: file.type });
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file');
+      console.log('❌ Invalid file type');
+      return;
+    }
+    
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB');
+      console.log('❌ File too large');
+      return;
+    }
+    
+    try {
+      console.log('🖼️ Processing file...');
+      
+      // Create immediate preview
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        console.log('✅ File read, creating preview');
+        updateAvatarPreview(container, e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+      
+      // Try server upload if available
+      if ((window as any).familyTreeManager && typeof (window as any).familyTreeManager.uploadAvatar === 'function') {
+        console.log('🚀 Attempting server upload...');
+        try {
+          const uploadedUrl = await (window as any).familyTreeManager.uploadAvatar(file);
+          if (urlInput) {
+            urlInput.value = uploadedUrl;
+          }
+          updateAvatarPreview(container, uploadedUrl);
+          console.log('✅ Server upload successful');
+        } catch (uploadError) {
+          console.log('⚠️ Server upload failed, using local preview:', uploadError);
+          const localUrl = URL.createObjectURL(file);
+          if (urlInput) {
+            urlInput.value = localUrl;
+          }
+          updateAvatarPreview(container, localUrl);
+        }
+      } else {
+        console.log('📷 No server available, using local preview');
+        const localUrl = URL.createObjectURL(file);
+        if (urlInput) {
+          urlInput.value = localUrl;
+        }
+        updateAvatarPreview(container, localUrl);
+      }
+    } catch (error) {
+      console.error('❌ Avatar upload failed:', error);
+      alert('Failed to upload avatar: ' + (error as Error).message);
+    }
+  });
+  
+  // Set up URL input handler
+  if (urlInput) {
+    urlInput.addEventListener('input', function(e) {
+      const url = (e.target as HTMLInputElement).value;
+      console.log('🔗 URL input changed:', url);
+      if (url) {
+        updateAvatarPreview(container, url);
+      }
+    });
+  }
+  
+  console.log('✅ Avatar upload handlers set up successfully!');
+  return true;
+}
+
+function updateAvatarPreview(container: HTMLElement, src: string) {
+  console.log('🖼️ Updating avatar preview with:', src);
+  const avatarContainer = container.querySelector('.avatar-upload-container');
+  if (!avatarContainer) {
+    console.log('❌ Avatar upload container not found');
+    return;
+  }
+  
+  let preview = avatarContainer.querySelector('.avatar-preview') as HTMLElement;
+  if (!preview) {
+    console.log('➕ Creating new preview element');
+    preview = document.createElement('div');
+    preview.className = 'avatar-preview';
+    avatarContainer.insertBefore(preview, avatarContainer.firstChild);
+  }
+  
+  preview.innerHTML = `<img src="${src}" alt="Avatar preview" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 8px; border: 2px solid #3498db;">`;
+  
+  // Update button text
+  const btn = avatarContainer.querySelector('.avatar-upload-btn') as HTMLElement;
+  if (btn) {
+    btn.textContent = 'Change Avatar';
+    console.log('✅ Updated button text to "Change Avatar"');
+  }
+  
+  console.log('✅ Avatar preview updated successfully');
 }
