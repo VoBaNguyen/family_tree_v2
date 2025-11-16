@@ -267,8 +267,8 @@ export class FamilyTreeManager {
       // Configure the cards with enhanced display
       const f3Card = this.f3Chart.setCardHtml()
         .setCardDisplay([
-          ["first name", "last name"], 
           ["title"], 
+          ["first name", "last name"], 
           ["birthday"]
         ]);
 
@@ -277,7 +277,7 @@ export class FamilyTreeManager {
 
       // Enable editing with enhanced fields including title
       this.f3EditTree = this.f3Chart.editTree()
-        .setFields(["first name", "last name", "sex", "title", "avatar", "birthday", "note"])
+        .setFields(["first name", "last name", "title", "avatar", "birthday"])
         .setEditFirst(true)
         .setCardClickOpen(f3Card);
 

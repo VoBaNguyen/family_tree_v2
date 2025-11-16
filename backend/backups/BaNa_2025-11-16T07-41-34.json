@@ -7,7 +7,7 @@
         "first name": "Võ Bá",
         "last name": "Di",
         "gender": "M",
-        "avatar": "http://localhost:3001/images/ba-na/1.jpg"
+        "avatar": "../images/ba-na/1.jpg"
       },
       "rels": {
         "spouses": [
@@ -30,7 +30,7 @@
         "first name": "Hoàng Thị",
         "last name": "Lé",
         "gender": "F",
-        "avatar": "http://localhost:3001/images/ba-na/1-spouse.jpg"
+        "avatar": "../images/ba-na/1-spouse.jpg"
       },
       "rels": {
         "spouses": [
@@ -72,8 +72,8 @@
     {
       "id": "2-spouse",
       "data": {
-        "first name": "Nguyễn Thị Ngọc",
-        "last name": "Lan",
+        "first name": "Bay",
+        "last name": "",
         "gender": "F"
       },
       "rels": {
@@ -154,8 +154,8 @@
     {
       "id": "10-spouse",
       "data": {
-        "first name": "Tôn Thất",
-        "last name": "Vãng",
+        "first name": "Vãng",
+        "last name": "",
         "gender": "M"
       },
       "rels": {
@@ -414,7 +414,7 @@
     {
       "id": "11",
       "data": {
-        "first name": "Chị",
+        "first name": "Chi",
         "last name": "",
         "gender": "F"
       },
@@ -428,7 +428,7 @@
     {
       "id": "12",
       "data": {
-        "first name": "Chị Xíu",
+        "first name": "Xiu",
         "last name": "Chi",
         "gender": "F"
       },
@@ -470,8 +470,8 @@
     {
       "id": "15",
       "data": {
-        "first name": "Tôn Thất",
-        "last name": "Tuấn",
+        "first name": "Tuấn",
+        "last name": "hello",
         "gender": "M",
         "sex": "",
         "title": "",
@@ -545,7 +545,7 @@
     {
       "id": "22",
       "data": {
-        "first name": "Võ Hoàng Quốc",
+        "first name": "Vo Hoang Quoc",
         "last name": "Huy",
         "gender": "M"
       },
@@ -559,7 +559,7 @@
     {
       "id": "23",
       "data": {
-        "first name": "Võ Hoàng Quỳnh",
+        "first name": "Vo Hoang Quynh",
         "last name": "Chi",
         "gender": "F"
       },
@@ -573,8 +573,8 @@
     {
       "id": "25",
       "data": {
-        "first name": "Chị Bé",
-        "last name": "Lớn",
+        "first name": "Be",
+        "last name": "Lon",
         "gender": "F"
       },
       "rels": {
@@ -588,7 +588,7 @@
       "id": "26",
       "data": {
         "first name": "Hoàng Thị Kim",
-        "last name": "Ngân",
+        "last name": "Ngan",
         "gender": "F"
       },
       "rels": {
@@ -619,7 +619,7 @@
         "last name": "Nguyên",
         "gender": "M",
         "note": "Current user",
-        "avatar": "http://localhost:3001/images/ba-na/user.png",
+        "avatar": "../images/ba-na/user.png",
         "birthday": "09/07/1996"
       },
       "rels": {
@@ -631,11 +631,7 @@
     }
   ],
   "metadata": {
-    "familyName": "Ba Na Family",
-    "savedAt": "2025-11-16T07:41:34.057Z",
-    "source": "manual_save",
-    "version": 1,
-    "imageCount": 0
+    "autoSavedAt": "2025-11-16T07:13:12.368Z"
   },
-  "lastModified": "2025-11-16T07:41:34.058Z"
+  "lastModified": "2025-11-16T07:13:12.368Z"
 }

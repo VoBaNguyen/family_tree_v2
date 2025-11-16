@@ -1,6 +1,6 @@
 .f3 {
-  --female-color: rgb(255, 105, 180);
-  --male-color: rgb(135, 206, 235);
+  --female-color: rgb(255, 0, 127); /* Stronger pink */
+  --male-color: rgb(0, 140, 255);   /* Stronger blue */
   --genderless-color: rgb(169, 169, 169);
   --background-color: rgb(18, 18, 18);
   --text-color: rgb(230, 230, 230);
@@ -385,7 +385,7 @@
   min-height: 70px;
   display: flex;
   align-items: center;
-  border-radius: 5px;
+  border-radius: 10px;
 }
 
 .f3 div.card-image-rect .person-icon {
@@ -615,7 +615,7 @@
 }
 
 .f3-form-cont.opened {
-  width: 350px;
+  width: 450px;
 }
 
 .f3-form {

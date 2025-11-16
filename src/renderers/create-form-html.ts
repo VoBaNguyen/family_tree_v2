@@ -13,7 +13,7 @@ export function getHtmlNew(form_creator: NewRelFormCreator) {
       
       <div class="f3-form-buttons">
         <button type="button" class="f3-cancel-btn">Cancel</button>
-        <button type="submit">Submit</button>
+        <button type="submit">Save</button>
       </div>
 
       ${form_creator.linkExistingRelative ? addLinkExistingRelative(form_creator) : ''}
@@ -36,29 +36,21 @@ export function getHtmlEdit(form_creator: EditDatumFormCreator) {
       
       <div class="f3-form-buttons">
         <button type="button" class="f3-cancel-btn">Cancel</button>
-        <button type="submit">Submit</button>
+        <button type="button" class="f3-delete-btn" ${form_creator.can_delete ? '' : 'disabled'}>
+          Delete
+        </button>
+        <button type="submit">Save</button>
       </div>
 
       ${form_creator.linkExistingRelative ? addLinkExistingRelative(form_creator) : ''}
 
       <hr>
-      ${deleteBtn(form_creator)}
 
       ${removeRelativeBtn(form_creator)}
     </form>
   `)
 
   
-}
-
-function deleteBtn(form_creator: EditDatumFormCreator) {
-  return (`
-    <div>
-      <button type="button" class="f3-delete-btn" ${form_creator.can_delete ? '' : 'disabled'}>
-        Delete
-      </button>
-    </div>
-  `)
 }
 
 function removeRelativeBtn(form_creator: EditDatumFormCreator) {
@@ -90,17 +82,20 @@ function editBtn(form_creator: EditDatumFormCreator) {
 function genderRadio(form_creator: EditDatumFormCreator | NewRelFormCreator) {
   if (!form_creator.editable) return ''
   return (`
-    <div class="f3-radio-group">
-      ${form_creator.gender_field.options.map(option => (`
-        <label>
-          <input type="radio" name="${form_creator.gender_field.id}" 
-            value="${option.value}" 
-            ${option.value === form_creator.gender_field.initial_value ? 'checked' : ''}
-            ${form_creator.gender_field.disabled ? 'disabled' : ''}
-          >
-          ${option.label}
-        </label>
-      `)).join('')}
+    <div class="f3-form-field">
+      <label>${form_creator.gender_field.label}</label>
+      <div class="f3-radio-group">
+        ${form_creator.gender_field.options.map(option => (`
+          <label>
+            <input type="radio" name="${form_creator.gender_field.id}" 
+              value="${option.value}" 
+              ${option.value === form_creator.gender_field.initial_value ? 'checked' : ''}
+              ${form_creator.gender_field.disabled ? 'disabled' : ''}
+            >
+            ${option.label}
+          </label>
+        `)).join('')}
+      </div>
     </div>
   `)
 }
