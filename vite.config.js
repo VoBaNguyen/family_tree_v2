@@ -3,7 +3,8 @@ import { resolve } from 'path';
 
 export default defineConfig({
   server: {
-    port: 8080
+    port: 8080,
+    allowedHosts: ['family-tree-ui.onrender.com']
   },
   build: {
     outDir: 'dist',
