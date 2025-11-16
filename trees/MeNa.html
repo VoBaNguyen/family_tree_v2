@@ -8,15 +8,31 @@
   <script src="../js/family-tree-api.js"></script>
   <link rel="stylesheet" href="../src/styles/family-chart.css">
   <style>
+    :root {
+      --dark-bg: #121212;
+      --dark-surface: #1e1e1e;
+      --dark-surface-variant: #2d2d2d;
+      --dark-text: #e0e0e0;
+      --dark-text-secondary: #b0b0b0;
+      --dark-border: #404040;
+      --primary-pink: #f093fb;
+      --primary-pink-hover: #ee82f0;
+      --success-green: #66bb6a;
+      --error-red: #ef5350;
+    }
+
     body { 
       font-family: 'Arial', sans-serif; 
       margin: 0;
       padding: 20px;
-      background-color: #f5f5f5;
+      background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-surface) 100%);
+      color: var(--dark-text);
+      min-height: 100vh;
     }
     h1 {
       text-align: center;
-      color: #333;
+      color: var(--dark-text);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
     .nav-container {
       position: fixed;
@@ -25,7 +41,7 @@
       z-index: 1000;
     }
     .back-button {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      background: linear-gradient(135deg, var(--primary-pink) 0%, var(--primary-pink-hover) 100%);
       color: white;
       border: none;
       padding: 12px 24px;
@@ -43,10 +59,10 @@
     .back-button:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
-      background: linear-gradient(135deg, #ee82f0 0%, #f3455a 100%);
+      background: linear-gradient(135deg, var(--primary-pink-hover) 0%, #f3455a 100%);
     }
     .save-btn {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      background: linear-gradient(135deg, var(--success-green) 0%, #4caf50 100%);
       color: white;
       border: none;
       padding: 8px 16px;
@@ -56,10 +72,12 @@
       cursor: pointer;
       margin: 0 5px;
       transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(102, 187, 106, 0.3);
     }
     .save-btn:hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      box-shadow: 0 4px 12px rgba(102, 187, 106, 0.4);
+      background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
     }
     .status-indicator {
       display: inline-block;
@@ -70,69 +88,98 @@
       margin-left: 10px;
     }
     .status-online {
-      background: #10b981;
+      background: var(--success-green);
       color: white;
+      box-shadow: 0 2px 8px rgba(102, 187, 106, 0.3);
     }
     .status-offline {
-      background: #ef4444;
+      background: var(--error-red);
       color: white;
+      box-shadow: 0 2px 8px rgba(239, 83, 80, 0.3);
     }
     
-    /* Enhanced card styling */
-    .f3-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
-    }
-    
-    .male-card {
-      border-color: #2196f3 !important;
-    }
-    
-    .female-card {
-      border-color: #e91e63 !important;
-    }
-    
-    .neutral-card {
-      border-color: #9e9e9e !important;
-    }
-    
-    /* Form styling enhancements */
+    /* Dark theme form styling */
     .f3-form {
-      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-      border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-      padding: 24px;
+      background: linear-gradient(135deg, var(--dark-surface) 0%, var(--dark-surface-variant) 100%) !important;
+      border: 1px solid var(--dark-border) !important;
+      border-radius: 12px !important;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+      padding: 24px !important;
     }
     
     .f3-form input, .f3-form textarea, .f3-form select {
-      border: 2px solid #e9ecef;
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 14px;
-      transition: all 0.3s ease;
+      background: var(--dark-surface) !important;
+      border: 2px solid var(--dark-border) !important;
+      color: var(--dark-text) !important;
+      border-radius: 8px !important;
+      padding: 10px 12px !important;
+      font-size: 14px !important;
+      transition: all 0.3s ease !important;
     }
     
     .f3-form input:focus, .f3-form textarea:focus, .f3-form select:focus {
-      border-color: #f093fb;
-      box-shadow: 0 0 0 3px rgba(240, 147, 251, 0.1);
-      outline: none;
+      border-color: var(--primary-pink) !important;
+      box-shadow: 0 0 0 3px rgba(240, 147, 251, 0.2) !important;
+      outline: none !important;
     }
     
     .f3-form label {
-      font-weight: 600;
-      color: #495057;
-      margin-bottom: 6px;
-      display: block;
+      font-weight: 600 !important;
+      color: var(--dark-text-secondary) !important;
+      margin-bottom: 6px !important;
+      display: block !important;
+      font-size: 13px !important;
     }
     
     .f3-form-title {
-      color: #f093fb;
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 20px;
+      color: var(--primary-pink) !important;
+      font-size: 20px !important;
+      font-weight: 600 !important;
+      margin-bottom: 20px !important;
+      text-align: center !important;
+      border-bottom: 2px solid var(--dark-border) !important;
+      padding-bottom: 12px !important;
+    }
+
+    /* Avatar upload styling */
+    .avatar-upload-container {
+      background: rgba(255,255,255,0.05);
+      border: 2px dashed rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 12px 0;
       text-align: center;
-      border-bottom: 2px solid #e9ecef;
-      padding-bottom: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .avatar-upload-container:hover {
+      border-color: rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.08);
+    }
+
+    .avatar-upload-btn {
+      background: linear-gradient(135deg, var(--primary-pink) 0%, var(--primary-pink-hover) 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin: 8px;
+    }
+
+    .avatar-upload-btn:hover {
+      background: linear-gradient(135deg, var(--primary-pink-hover) 0%, #f3455a 100%);
+      transform: translateY(-1px);
+    }
+
+    .avatar-preview {
+      max-width: 80px;
+      max-height: 80px;
+      border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.2);
+      margin: 8px;
     }
   </style>
 </head>
@@ -171,6 +218,9 @@ let familyData = [];
 // Initialize tree manager and setup
 const manager = new FamilyTreeManager(TREE_ID, familyData, treeAPI);
 manager.setupEventHandlers('Me Na Family');
+
+// Make manager globally available for persistence API
+window.familyTreeManager = manager;
 
 // Initialize the tree with error handling
 async function initializeTree() {

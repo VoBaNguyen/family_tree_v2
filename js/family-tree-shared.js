@@ -47,32 +47,34 @@ export class FamilyTreeManager {
 
     const modalContent = document.createElement('div');
     modalContent.style.cssText = `
-      background: white;
-      border-radius: 8px;
+      background: linear-gradient(135deg, var(--modal-bg, #1e1e1e) 0%, var(--card-bg, #2d2d2d) 100%);
+      border-radius: 12px;
       padding: 24px;
       max-width: 600px;
       max-height: 80vh;
       overflow-y: auto;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      border: 1px solid var(--card-border, #404040);
+      color: var(--text-color, #e0e0e0);
     `;
 
     modalContent.innerHTML = `
-      <h2 style="margin: 0 0 16px 0; color: #333;">Tree Backups</h2>
+      <h2 style="margin: 0 0 16px 0; color: var(--text-color, #e0e0e0); border-bottom: 2px solid var(--card-border, #404040); padding-bottom: 12px;">Tree Backups</h2>
       <div style="margin-bottom: 16px;">
         ${backups.map((backup, index) => `
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee;">
-            <span style="font-size: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--card-border, #404040); background: var(--input-bg, #2d2d2d); margin-bottom: 8px; border-radius: 6px;">
+            <span style="font-size: 14px; color: var(--text-color, #e0e0e0);">
               ${backup.filename} 
-              <small style="color: #666;">(${backup.date})</small>
+              <small style="color: var(--text-color-secondary, #b0b0b0);">(${backup.date})</small>
             </span>
-            <button onclick="window.restoreBackup('${backup.filename}')" style="background: #007bff; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer;">
+            <button onclick="window.restoreBackup('${backup.filename}')" style="background: linear-gradient(135deg, var(--primary-color, #4fc3f7) 0%, #29b6f6 100%); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">
               Restore
             </button>
           </div>
         `).join('')}
       </div>
       <div style="text-align: center;">
-        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">
           Close
         </button>
       </div>
@@ -357,42 +359,82 @@ export class FamilyTreeManager {
 
     // Style the original input
     avatarInput.placeholder = 'Image URL or upload new photo...';
-    avatarInput.style.marginBottom = '8px';
+    avatarInput.style.cssText += `
+      background: var(--dark-surface, #2d2d2d) !important;
+      border: 2px solid var(--dark-border, #404040) !important;
+      color: var(--dark-text, #e0e0e0) !important;
+      margin-bottom: 12px !important;
+    `;
 
-    // Create container for upload controls
+    // Create main container for upload interface
+    const uploadSection = document.createElement('div');
+    uploadSection.style.cssText = `
+      background: var(--dark-surface-variant, #3d3d3d);
+      border: 1px solid var(--dark-border, #404040);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 8px;
+    `;
+
+    // Create section title
+    const title = document.createElement('div');
+    title.textContent = '📸 Avatar Photo';
+    title.style.cssText = `
+      font-weight: 600;
+      color: var(--dark-text, #e0e0e0);
+      margin-bottom: 12px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--dark-border, #404040);
+      padding-bottom: 8px;
+    `;
+
+    // Create upload controls container
     const uploadContainer = document.createElement('div');
     uploadContainer.style.cssText = `
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-top: 4px;
-      padding: 8px;
-      background: #f8f9fa;
-      border-radius: 6px;
-      border: 1px solid #e9ecef;
+      gap: 12px;
+      margin-bottom: 12px;
     `;
 
-    // Create file input
+    // Create file input (hidden)
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
     fileInput.style.display = 'none';
 
-    // Create upload button
+    // Create main upload button
     const uploadBtn = document.createElement('button');
-    uploadBtn.textContent = '📸 Upload Photo';
+    uploadBtn.textContent = '� Upload Avatar';
     uploadBtn.type = 'button';
     uploadBtn.style.cssText = `
-      padding: 6px 12px;
-      background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+      padding: 8px 16px;
+      background: linear-gradient(135deg, var(--primary-color, #4fc3f7) 0%, #29b6f6 100%);
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(79, 195, 247, 0.3);
+    `;
+
+    // Create remove button
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = '🗑️ Remove';
+    removeBtn.type = 'button';
+    removeBtn.style.cssText = `
+      display: none;
+      padding: 6px 12px;
+      background: var(--error-color, #ef5350);
+      color: white;
+      border: none;
+      border-radius: 6px;
       cursor: pointer;
       font-size: 12px;
       font-weight: 500;
-      transition: all 0.2s ease;
-      white-space: nowrap;
+      transition: all 0.3s ease;
     `;
 
     // Create preview container
@@ -400,55 +442,41 @@ export class FamilyTreeManager {
     previewContainer.style.cssText = `
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
     `;
 
     // Create preview image
     const preview = document.createElement('img');
     preview.style.cssText = `
       display: none;
-      width: 50px;
-      height: 50px;
-      border-radius: 6px;
-      border: 2px solid #dee2e6;
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      border: 2px solid var(--dark-border, #404040);
       object-fit: cover;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    `;
-
-    // Create remove button
-    const removeBtn = document.createElement('button');
-    removeBtn.textContent = '🗑️';
-    removeBtn.type = 'button';
-    removeBtn.title = 'Remove photo';
-    removeBtn.style.cssText = `
-      display: none;
-      padding: 4px 6px;
-      background: #dc3545;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     `;
 
     // Create status indicator
-    const statusIndicator = document.createElement('span');
+    const statusIndicator = document.createElement('div');
     statusIndicator.style.cssText = `
-      font-size: 11px;
-      color: #6c757d;
+      font-size: 12px;
+      color: var(--dark-text-secondary, #b0b0b0);
       font-style: italic;
     `;
 
-    // Assemble the upload container
-    previewContainer.appendChild(preview);
-    previewContainer.appendChild(removeBtn);
+    // Assemble the upload section
+    uploadSection.appendChild(title);
     uploadContainer.appendChild(fileInput);
     uploadContainer.appendChild(uploadBtn);
-    uploadContainer.appendChild(previewContainer);
-    uploadContainer.appendChild(statusIndicator);
+    uploadContainer.appendChild(removeBtn);
+    uploadSection.appendChild(uploadContainer);
+    previewContainer.appendChild(preview);
+    previewContainer.appendChild(statusIndicator);
+    uploadSection.appendChild(previewContainer);
 
     // Insert after the avatar input
-    avatarInput.parentNode.insertBefore(uploadContainer, avatarInput.nextSibling);
+    avatarInput.parentNode.insertBefore(uploadSection, avatarInput.nextSibling);
 
     // Function to show current avatar if exists
     const showCurrentAvatar = () => {
@@ -456,11 +484,13 @@ export class FamilyTreeManager {
         preview.src = avatarInput.value;
         preview.style.display = 'block';
         removeBtn.style.display = 'inline-block';
-        statusIndicator.textContent = 'Current photo';
+        statusIndicator.textContent = 'Current photo loaded';
+        statusIndicator.style.color = 'var(--success-color, #66bb6a)';
       } else {
         preview.style.display = 'none';
         removeBtn.style.display = 'none';
         statusIndicator.textContent = 'No photo selected';
+        statusIndicator.style.color = 'var(--dark-text-secondary, #b0b0b0)';
       }
     };
 
@@ -474,13 +504,13 @@ export class FamilyTreeManager {
 
     // Handle upload button hover
     uploadBtn.addEventListener('mouseenter', () => {
-      uploadBtn.style.transform = 'translateY(-1px)';
-      uploadBtn.style.boxShadow = '0 4px 12px rgba(0, 123, 255, 0.3)';
+      uploadBtn.style.transform = 'translateY(-2px)';
+      uploadBtn.style.boxShadow = '0 4px 12px rgba(79, 195, 247, 0.4)';
     });
 
     uploadBtn.addEventListener('mouseleave', () => {
       uploadBtn.style.transform = 'translateY(0)';
-      uploadBtn.style.boxShadow = 'none';
+      uploadBtn.style.boxShadow = '0 2px 8px rgba(79, 195, 247, 0.3)';
     });
 
     // Handle remove button click
@@ -493,14 +523,15 @@ export class FamilyTreeManager {
     // Handle avatar input changes (manual URL input)
     avatarInput.addEventListener('input', showCurrentAvatar);
 
-    // Handle file selection
+    // Handle file selection and upload
     fileInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
 
       // Validate file size (5MB limit)
       if (file.size > 5 * 1024 * 1024) {
-        alert('File size must be less than 5MB');
+        statusIndicator.textContent = 'File too large (max 5MB)';
+        statusIndicator.style.color = 'var(--error-color, #ef5350)';
         return;
       }
 
@@ -508,53 +539,111 @@ export class FamilyTreeManager {
         uploadBtn.textContent = '⏳ Uploading...';
         uploadBtn.disabled = true;
         uploadBtn.style.opacity = '0.7';
-        statusIndicator.textContent = 'Uploading...';
-        statusIndicator.style.color = '#ffc107';
+        statusIndicator.textContent = 'Uploading image...';
+        statusIndicator.style.color = 'var(--warning-color, #ffc107)';
 
-        const formData = new FormData();
-        formData.append('avatar', file);
-
-        const response = await fetch(`http://localhost:3001/api/images/${this.treeId}/upload`, {
-          method: 'POST',
-          body: formData
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          const fullImageUrl = `http://localhost:3001${result.imageUrl}`;
-          avatarInput.value = fullImageUrl;
+        // Upload the image to the server
+        const imageUrl = await this.uploadAvatarToServer(file);
+        
+        if (imageUrl) {
+          avatarInput.value = imageUrl;
           showCurrentAvatar();
           
           // Trigger change event on the input
           avatarInput.dispatchEvent(new Event('change'));
           
           statusIndicator.textContent = 'Photo uploaded successfully!';
-          statusIndicator.style.color = '#28a745';
+          statusIndicator.style.color = 'var(--success-color, #66bb6a)';
           
-          console.log('✓ Avatar uploaded successfully:', result.imageUrl);
+          console.log('✓ Avatar uploaded successfully:', imageUrl);
 
           // Reset status after 3 seconds
           setTimeout(() => {
-            statusIndicator.textContent = 'Current photo';
-            statusIndicator.style.color = '#6c757d';
+            statusIndicator.textContent = 'Current photo loaded';
+            statusIndicator.style.color = 'var(--success-color, #66bb6a)';
           }, 3000);
         } else {
-          throw new Error(result.error || 'Upload failed');
+          throw new Error('Upload failed - no URL returned');
         }
 
       } catch (error) {
         console.error('❌ Avatar upload failed:', error);
-        statusIndicator.textContent = 'Upload failed';
-        statusIndicator.style.color = '#dc3545';
-        alert('Failed to upload avatar: ' + error.message);
+        statusIndicator.textContent = `Upload failed: ${error.message}`;
+        statusIndicator.style.color = 'var(--error-color, #ef5350)';
       } finally {
-        uploadBtn.textContent = '📸 Upload Photo';
+        uploadBtn.textContent = '� Upload Avatar';
         uploadBtn.disabled = false;
         uploadBtn.style.opacity = '1';
         fileInput.value = ''; // Reset file input
       }
     });
+  }
+
+  // Upload avatar to server and return the URL
+  async uploadAvatarToServer(file) {
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    const response = await fetch(`http://localhost:3001/api/images/${this.treeId}/upload`, {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      return `http://localhost:3001${result.imageUrl}`;
+    } else {
+      throw new Error(result.error || 'Upload failed');
+    }
+  }
+
+  // Helper function to ensure avatar is on server before saving
+  async ensureAvatarUploaded(personData) {
+    if (!personData.avatar || !personData.avatar.trim()) {
+      return personData; // No avatar to check
+    }
+
+    // Check if avatar is a local file (data URL or blob URL)
+    const avatarUrl = personData.avatar.trim();
+    if (avatarUrl.startsWith('data:') || avatarUrl.startsWith('blob:')) {
+      console.log('🔄 Detected local avatar image, uploading to server...');
+      
+      try {
+        // Convert data URL to blob if needed
+        let blob;
+        if (avatarUrl.startsWith('data:')) {
+          const response = await fetch(avatarUrl);
+          blob = await response.blob();
+        } else {
+          const response = await fetch(avatarUrl);
+          blob = await response.blob();
+        }
+        
+        // Create a file from the blob
+        const file = new File([blob], 'avatar.jpg', { type: blob.type || 'image/jpeg' });
+        
+        // Upload to server
+        const serverUrl = await this.uploadAvatarToServer(file);
+        
+        // Update the person data with the server URL
+        personData.avatar = serverUrl;
+        console.log('✅ Avatar uploaded to server:', serverUrl);
+        
+        // Update the input field if it exists
+        const avatarInput = document.querySelector('input[data-field="avatar"]');
+        if (avatarInput) {
+          avatarInput.value = serverUrl;
+          avatarInput.dispatchEvent(new Event('change'));
+        }
+        
+      } catch (error) {
+        console.error('❌ Failed to upload avatar to server:', error);
+        // Continue with save anyway - user can fix later
+      }
+    }
+    
+    return personData;
   }
 
   // Add enhanced card styling via CSS
@@ -576,11 +665,6 @@ export class FamilyTreeManager {
         transition: all 0.3s ease !important;
         border: 2px solid #dee2e6 !important;
         background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
-      }
-
-      .f3 .card:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
       }
 
       .f3 .card .card-text {

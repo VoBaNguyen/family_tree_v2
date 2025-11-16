@@ -127,6 +127,14 @@ class FamilyTreeAPI {
       saveTimeout = setTimeout(async () => {
         try {
           const treeData = f3EditTree.exportData();
+          
+          // Ensure avatars are uploaded to server before saving
+          if (window.familyTreeManager && typeof window.familyTreeManager.ensureAvatarUploaded === 'function') {
+            for (const person of treeData) {
+              await window.familyTreeManager.ensureAvatarUploaded(person);
+            }
+          }
+          
           const result = await this.autoSaveTree(treeId, treeData);
           
           this.pendingChanges = false;
@@ -180,6 +188,14 @@ class FamilyTreeAPI {
 
     try {
       const treeData = f3EditTree.exportData();
+      
+      // Ensure avatars are uploaded to server before saving
+      if (window.familyTreeManager && typeof window.familyTreeManager.ensureAvatarUploaded === 'function') {
+        for (const person of treeData) {
+          await window.familyTreeManager.ensureAvatarUploaded(person);
+        }
+      }
+      
       const result = await this.saveTree(treeId, treeData, metadata);
       
       this.pendingChanges = false;
