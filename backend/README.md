@@ -20,7 +20,7 @@ npm start
 npm run dev
 ```
 
-The server will start on http://localhost:3001
+The server will start on http://localhost:3001 |  https://family-tree-v2.onrender.com
 
 ### 3. Open Your Family Trees
 

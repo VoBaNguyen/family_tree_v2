@@ -192,7 +192,7 @@ export class FamilyTreeManager {
       if (!this.familyData || this.familyData.length === 0) {
         console.log(`🔍 familyData is empty for ${this.treeId}, attempting to load initial data...`);
         try {
-          const response = await fetch(`http://localhost:3001/api/initial/${this.treeId}`);
+          const response = await fetch(` https://family-tree-v2.onrender.com/api/initial/${this.treeId}`);
           console.log(`📡 Initial data response status: ${response.status} ${response.statusText}`);
           
           if (response.ok) {
@@ -655,7 +655,7 @@ export class FamilyTreeManager {
     const formData = new FormData();
     formData.append('avatar', file);
 
-    const response = await fetch(`http://localhost:3001/api/images/${this.treeId}/upload`, {
+    const response = await fetch(` https://family-tree-v2.onrender.com/api/images/${this.treeId}/upload`, {
       method: 'POST',
       body: formData
     });
@@ -663,7 +663,7 @@ export class FamilyTreeManager {
     const result = await response.json();
 
     if (result.success) {
-      return `http://localhost:3001${result.imageUrl}`;
+      return ` https://family-tree-v2.onrender.com${result.imageUrl}`;
     } else {
       throw new Error(result.error || 'Upload failed');
     }
@@ -763,17 +763,17 @@ export class FamilyTreeManager {
     // If it's a relative path starting with ../images/, convert to server URL
     if (url.startsWith('../images/') || url.startsWith('./images/') || url.startsWith('images/')) {
       const imagePath = url.replace(/^\.\.\/|^\.\//, '');
-      return `http://localhost:3001/${imagePath}`;
+      return ` https://family-tree-v2.onrender.com/${imagePath}`;
     }
     
     // If it's just a filename, assume it's in the tree's image folder
     if (!url.includes('/') && (url.endsWith('.jpg') || url.endsWith('.png') || url.endsWith('.jpeg') || url.endsWith('.gif'))) {
-      return `http://localhost:3001/images/${this.treeId}/${url}`;
+      return ` https://family-tree-v2.onrender.com/images/${this.treeId}/${url}`;
     }
     
     // If it starts with /, treat as absolute path on server
     if (url.startsWith('/')) {
-      return `http://localhost:3001${url}`;
+      return ` https://family-tree-v2.onrender.com${url}`;
     }
     
     // Otherwise, return as-is (might be data URL, blob URL, or external URL)

@@ -3,7 +3,7 @@
  * Handles all communication with the backend API
  */
 class FamilyTreeAPI {
-  constructor(baseURL = 'http://localhost:3001/api') {
+  constructor(baseURL = ' https://family-tree-v2.onrender.com/api') {
     this.baseURL = baseURL;
     this.isOnline = true;
     this.setupOfflineDetection();

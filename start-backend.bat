@@ -81,7 +81,7 @@ if errorlevel 1 (
 REM Start the server
 echo.
 echo 🚀 Starting Family Tree API Server...
-echo Server will be available at: http://localhost:3001
+echo Server will be available at: http://localhost:3001 |  https://family-tree-v2.onrender.com
 echo API endpoints:
 echo   - Health check: GET /api/health
 echo   - Get trees: GET /api/trees

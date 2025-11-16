@@ -4,7 +4,7 @@
  */
 
 class FamilyTreeAPI {
-  constructor(baseURL = 'http://localhost:3001/api') {
+  constructor(baseURL = ' https://family-tree-v2.onrender.com/api') {
     this.baseURL = baseURL;
     this.autoSaveInterval = null;
     this.autoSaveDelay = 2000; // 2 seconds delay for auto-save

@@ -7,7 +7,7 @@
         "first name": "Võ Bá",
         "last name": "Di",
         "gender": "M",
-        "avatar": "http://localhost:3001/images/ba-na/1.jpg"
+        "avatar": " https://family-tree-v2.onrender.com/images/ba-na/1.jpg"
       },
       "rels": {
         "spouses": [
@@ -30,7 +30,7 @@
         "first name": "Hoàng Thị",
         "last name": "Lé",
         "gender": "F",
-        "avatar": "http://localhost:3001/images/ba-na/1-spouse.jpg"
+        "avatar": " https://family-tree-v2.onrender.com/images/ba-na/1-spouse.jpg"
       },
       "rels": {
         "spouses": [
@@ -619,7 +619,7 @@
         "last name": "Nguyên",
         "gender": "M",
         "note": "Current user",
-        "avatar": "http://localhost:3001/images/ba-na/user.png",
+        "avatar": " https://family-tree-v2.onrender.com/images/ba-na/user.png",
         "birthday": "09/07/1996"
       },
       "rels": {
