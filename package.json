@@ -43,9 +43,11 @@
   "scripts": {
     "build": "node build.js",
     "build:vercel": "node vercel-build.cjs",
+    "build:render": "node vercel-build.cjs && npm install -g http-server",
+    "start": "http-server dist -p $PORT -a 0.0.0.0",
     "test": "cypress open",
     "test-run": "cypress run",
-    "dev": "vite",
+    "dev": "vite --host 0.0.0.0 --port $PORT",
     "docs": "typedoc",
     "docs:deploy": "yarn docs && gh-pages -d docs/api -b gh-pages",
     "prepublishOnly": "node prePublish.js"
