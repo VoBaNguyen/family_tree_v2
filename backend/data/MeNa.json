@@ -1,0 +1,437 @@
+[
+  {
+    "id": "1",
+    "data": {
+      "first name": "Võ Bá",
+      "last name": "Phan",
+      "gender": "M",
+      "avatar": "../images/me-na/1.jpg"
+    },
+    "rels": {
+      "spouses": ["1-spouse"],
+      "children": ["2", "6", "10", "16", "21", "24", "27"]
+    }
+  },
+  {
+    "id": "1-spouse",
+    "data": {
+      "first name": "Hoàng Thị",
+      "last name": "Lé",
+      "gender": "F",
+      "avatar": "../images/me-na/1-spouse.jpg"
+    },
+    "rels": {
+      "spouses": ["1"],
+      "children": ["2", "6", "10", "16", "21", "24", "27"]
+    }
+  },
+  {
+    "id": "2",
+    "data": {
+      "first name": "Võ Bá",
+      "last name": "Sang",
+      "gender": "M"
+    },
+    "rels": {
+      "parents": ["1", "1-spouse"],
+      "spouses": ["2-spouse"],
+      "children": ["3", "4", "5"]
+    }
+  },
+  {
+    "id": "2-spouse",
+    "data": {
+      "first name": "Bay",
+      "last name": "",
+      "gender": "F"
+    },
+    "rels": {
+      "spouses": ["2"],
+      "children": ["3", "4", "5"]
+    }
+  },
+  {
+    "id": "6",
+    "data": {
+      "first name": "Võ Bá",
+      "last name": "Sinh",
+      "gender": "M"
+    },
+    "rels": {
+      "parents": ["1", "1-spouse"],
+      "spouses": ["6-spouse"],
+      "children": ["7", "8", "9"]
+    }
+  },
+  {
+    "id": "6-spouse",
+    "data": {
+      "first name": "Hoàng Thị",
+      "last name": "Cam",
+      "gender": "F"
+    },
+    "rels": {
+      "spouses": ["6"],
+      "children": ["7", "8", "9"]
+    }
+  },
+  {
+    "id": "10",
+    "data": {
+      "first name": "Võ Thị",
+      "last name": "Hạnh",
+      "gender": "F"
+    },
+    "rels": {
+      "parents": ["1", "1-spouse"],
+      "spouses": ["10-spouse"],
+      "children": ["11", "12", "13", "14", "15"]
+    }
+  },
+  {
+    "id": "10-spouse",
+    "data": {
+      "first name": "Vãng",
+      "last name": "",
+      "gender": "M"
+    },
+    "rels": {
+      "spouses": ["10"],
+      "children": ["11", "12", "13", "14", "15"]
+    }
+  },
+  {
+    "id": "16",
+    "data": {
+      "first name": "Võ Thị",
+      "last name": "Tánh",
+      "gender": "F"
+    },
+    "rels": {
+      "parents": ["1", "1-spouse"],
+      "spouses": ["16-spouse"],
+      "children": ["17", "18", "19", "20"]
+    }
+  },
+  {
+    "id": "16-spouse",
+    "data": {
+      "first name": "Hoàng Trọng",
+      "last name": "Đại",
+      "gender": "M"
+    },
+    "rels": {
+      "spouses": ["16"],
+      "children": ["17", "18", "19", "20"]
+    }
+  },
+  {
+    "id": "21",
+    "data": {
+      "first name": "Võ Bá",
+      "last name": "Trai",
+      "gender": "M"
+    },
+    "rels": {
+      "parents": ["1", "1-spouse"],
+      "spouses": ["21-spouse"],
+      "children": ["22", "23"]
+    }
+  },
+  {
+    "id": "21-spouse",
+    "data": {
+      "first name": "Hoàng Thị",
+      "last name": "Túy",
+      "gender": "F"
+    },
+    "rels": {
+      "spouses": ["21"],
+      "children": ["22", "23"]
+    }
+  },
+  {
+    "id": "24",
+    "data": {
+      "first name": "Võ Thị",
+      "last name": "Hiệp",
+      "gender": "F"
+    },
+    "rels": {
+      "parents": ["1", "1-spouse"],
+      "spouses": ["24-spouse"],
+      "children": ["25", "26"]
+    }
+  },
+  {
+    "id": "24-spouse",
+    "data": {
+      "first name": "Hoàng Trọng",
+      "last name": "Cường",
+      "gender": "M"
+    },
+    "rels": {
+      "spouses": ["24"],
+      "children": ["25", "26"]
+    }
+  },
+  {
+    "id": "27",
+    "data": {
+      "first name": "Võ Bá",
+      "last name": "Nẫm",
+      "gender": "M"
+    },
+    "rels": {
+      "parents": ["1", "1-spouse"],
+      "spouses": ["27-spouse"],
+      "children": ["28", "29"]
+    }
+  },
+  {
+    "id": "27-spouse",
+    "data": {
+      "first name": "Nguyễn Thị",
+      "last name": "Thu",
+      "gender": "F"
+    },
+    "rels": {
+      "spouses": ["27"],
+      "children": ["28", "29"]
+    }
+  },
+  {
+    "id": "3",
+    "data": {
+      "first name": "Ky",
+      "last name": "",
+      "gender": "M"
+    },
+    "rels": {
+      "parents": ["2", "2-spouse"]
+    }
+  },
+  {
+    "id": "4",
+    "data": {
+      "first name": "Ni",
+      "last name": "chi",
+      "gender": "F"
+    },
+    "rels": {
+      "parents": ["2", "2-spouse"]
+    }
+  },
+  {
+    "id": "5",
+    "data": {
+      "first name": "Ni",
+      "last name": "em",
+      "gender": "F"
+    },
+    "rels": {
+      "parents": ["2", "2-spouse"]
+    }
+  },
+  {
+    "id": "7",
+    "data": {
+      "first name": "Võ Bá",
+      "last name": "Tuấn",
+      "gender": "M"
+    },
+    "rels": {
+      "parents": ["6", "6-spouse"]
+    }
+  },
+  {
+    "id": "8",
+    "data": {
+      "first name": "Võ Thị",
+      "last name": "Quỳnh",
+      "gender": "F"
+    },
+    "rels": {
+      "parents": ["6", "6-spouse"]
+    }
+  },
+  {
+    "id": "9",
+    "data": {
+      "first name": "Võ Bá",
+      "last name": "Giàu",
+      "gender": "M"
+    },
+    "rels": {
+      "parents": ["6", "6-spouse"]
+    }
+  },
+  {
+    "id": "11",
+    "data": {
+      "first name": "Chi",
+      "last name": "",
+      "gender": "F"
+    },
+    "rels": {
+      "parents": ["10", "10-spouse"]
+    }
+  },
+  {
+    "id": "12",
+    "data": {
+      "first name": "Xiu",
+      "last name": "Chi",
+      "gender": "F"
+    },
+    "rels": {
+      "parents": ["10", "10-spouse"]
+    }
+  },
+  {
+    "id": "13",
+    "data": {
+      "first name": "Thảo",
+      "last name": "",
+      "gender": "F"
+    },
+    "rels": {
+      "parents": ["10", "10-spouse"]
+    }
+  },
+  {
+    "id": "14",
+    "data": {
+      "first name": "Xiu",
+      "last name": "em",
+      "gender": "F"
+    },
+    "rels": {
+      "parents": ["10", "10-spouse"]
+    }
+  },
+  {
+    "id": "15",
+    "data": {
+      "first name": "Tuấn",
+      "last name": "",
+      "gender": "M"
+    },
+    "rels": {
+      "parents": ["10", "10-spouse"]
+    }
+  },
+  {
+    "id": "17",
+    "data": {
+      "first name": "Hoàng Trọng",
+      "last name": "Thắng",
+      "gender": "M"
+    },
+    "rels": {
+      "parents": ["16", "16-spouse"]
+    }
+  },
+  {
+    "id": "18",
+    "data": {
+      "first name": "Bé",
+      "last name": "",
+      "gender": "F"
+    },
+    "rels": {
+      "parents": ["16", "16-spouse"]
+    }
+  },
+  {
+    "id": "19",
+    "data": {
+      "first name": "Hoàng Trọng",
+      "last name": "Bách",
+      "gender": "M"
+    },
+    "rels": {
+      "parents": ["16", "16-spouse"]
+    }
+  },
+  {
+    "id": "20",
+    "data": {
+      "first name": "Hoàng Thị Ngọc",
+      "last name": "Hảo",
+      "gender": "F"
+    },
+    "rels": {
+      "parents": ["16", "16-spouse"]
+    }
+  },
+  {
+    "id": "22",
+    "data": {
+      "first name": "Vo Hoang Quoc",
+      "last name": "Huy",
+      "gender": "M"
+    },
+    "rels": {
+      "parents": ["21", "21-spouse"]
+    }
+  },
+  {
+    "id": "23",
+    "data": {
+      "first name": "Vo Hoang Quynh",
+      "last name": "Chi",
+      "gender": "F"
+    },
+    "rels": {
+      "parents": ["21", "21-spouse"]
+    }
+  },
+  {
+    "id": "25",
+    "data": {
+      "first name": "Be",
+      "last name": "Lon",
+      "gender": "F"
+    },
+    "rels": {
+      "parents": ["24", "24-spouse"]
+    }
+  },
+  {
+    "id": "26",
+    "data": {
+      "first name": "Hoàng Thị Kim",
+      "last name": "Ngan",
+      "gender": "F"
+    },
+    "rels": {
+      "parents": ["24", "24-spouse"]
+    }
+  },
+  {
+    "id": "28",
+    "data": {
+      "first name": "Võ Bá",
+      "last name": "Duc",
+      "gender": "M"
+    },
+    "rels": {
+      "parents": ["27", "27-spouse"]
+    }
+  },
+  {
+    "id": "29",
+    "data": {
+      "first name": "Võ Bá",
+      "last name": "Nguyen",
+      "gender": "M",
+      "note": "Current user",
+      "avatar": "../images/me-na/29.jpg",
+      "birthday": "1990"
+    },
+    "rels": {
+      "parents": ["27", "27-spouse"]
+    }
+  }
+]
