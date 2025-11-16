@@ -208,6 +208,10 @@ export class FamilyTreeManager {
               this.familyData = [];
             }
             
+            // Normalize avatar URLs in the loaded data
+            this.familyData = this.normalizeAvatarUrlsInData(this.familyData);
+            console.log('🔄 Normalized avatar URLs in initial data');
+            
             console.log(`📥 Loaded initial ${this.treeId} data with ${this.familyData.length} people`);
             
             if (this.familyData.length === 0) {
@@ -240,6 +244,11 @@ export class FamilyTreeManager {
         console.error('❌ familyData is not an array:', typeof this.familyData, this.familyData);
         throw new Error(`familyData must be an array, got ${typeof this.familyData}`);
       }
+      
+      // Normalize avatar URLs before creating chart
+      console.log('🔄 Normalizing avatar URLs...');
+      this.familyData = this.normalizeAvatarUrlsInData(this.familyData);
+      console.log('✅ Avatar URLs normalized');
       
       try {
         this.f3Chart = f3.createChart('#FamilyChart', this.familyData)
@@ -524,11 +533,30 @@ export class FamilyTreeManager {
     // Function to show current avatar if exists
     const showCurrentAvatar = () => {
       if (avatarInput.value && avatarInput.value.trim()) {
-        preview.src = avatarInput.value;
+        // Normalize the avatar URL for display
+        const normalizedUrl = this.normalizeAvatarUrl(avatarInput.value.trim());
+        preview.src = normalizedUrl;
         preview.style.display = 'block';
         removeBtn.style.display = 'inline-block';
         statusIndicator.textContent = 'Current photo loaded';
         statusIndicator.style.color = 'var(--success-color, #66bb6a)';
+        
+        // Add error handling for image loading
+        preview.onerror = () => {
+          console.warn('Failed to load avatar image:', normalizedUrl);
+          statusIndicator.textContent = 'Image failed to load';
+          statusIndicator.style.color = 'var(--error-color, #ef5350)';
+        };
+        
+        preview.onload = () => {
+          statusIndicator.textContent = 'Current photo loaded';
+          statusIndicator.style.color = 'var(--success-color, #66bb6a)';
+        };
+        
+        // Update the input with the normalized URL if it's different
+        if (normalizedUrl !== avatarInput.value.trim()) {
+          avatarInput.value = normalizedUrl;
+        }
       } else {
         preview.style.display = 'none';
         removeBtn.style.display = 'none';
@@ -655,19 +683,32 @@ export class FamilyTreeManager {
       return personData; // No avatar to check
     }
 
-    // Check if avatar is a local file (data URL or blob URL)
-    const avatarUrl = data.avatar.trim();
-    if (avatarUrl.startsWith('data:') || avatarUrl.startsWith('blob:')) {
+    // First normalize the avatar URL
+    const originalUrl = data.avatar.trim();
+    const normalizedUrl = this.normalizeAvatarUrl(originalUrl);
+    
+    // Update the avatar URL with normalized version
+    if (normalizedUrl !== originalUrl) {
+      if (personData.data) {
+        personData.data.avatar = normalizedUrl;
+      } else {
+        personData.avatar = normalizedUrl;
+      }
+      console.log(`🔄 Normalized avatar URL: ${originalUrl} → ${normalizedUrl}`);
+    }
+
+    // Check if avatar is a local file (data URL or blob URL) that needs uploading
+    if (normalizedUrl.startsWith('data:') || normalizedUrl.startsWith('blob:')) {
       console.log('🔄 Detected local avatar image, uploading to server...');
       
       try {
         // Convert data URL to blob if needed
         let blob;
-        if (avatarUrl.startsWith('data:')) {
-          const response = await fetch(avatarUrl);
+        if (normalizedUrl.startsWith('data:')) {
+          const response = await fetch(normalizedUrl);
           blob = await response.blob();
         } else {
-          const response = await fetch(avatarUrl);
+          const response = await fetch(normalizedUrl);
           blob = await response.blob();
         }
         
@@ -699,6 +740,55 @@ export class FamilyTreeManager {
     }
     
     return personData;
+  }
+
+  // Normalize avatar URL to ensure it points to the server
+  normalizeAvatarUrl(avatarUrl) {
+    if (!avatarUrl || !avatarUrl.trim()) {
+      return avatarUrl;
+    }
+
+    const url = avatarUrl.trim();
+    
+    // If it's already a full server URL, return as-is
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    
+    // If it's a relative path starting with ../images/, convert to server URL
+    if (url.startsWith('../images/') || url.startsWith('./images/') || url.startsWith('images/')) {
+      const imagePath = url.replace(/^\.\.\/|^\.\//, '');
+      return `http://localhost:3001/${imagePath}`;
+    }
+    
+    // If it's just a filename, assume it's in the tree's image folder
+    if (!url.includes('/') && (url.endsWith('.jpg') || url.endsWith('.png') || url.endsWith('.jpeg') || url.endsWith('.gif'))) {
+      return `http://localhost:3001/images/${this.treeId}/${url}`;
+    }
+    
+    // If it starts with /, treat as absolute path on server
+    if (url.startsWith('/')) {
+      return `http://localhost:3001${url}`;
+    }
+    
+    // Otherwise, return as-is (might be data URL, blob URL, or external URL)
+    return url;
+  }
+
+  // Normalize all avatar URLs in family data
+  normalizeAvatarUrlsInData(familyData) {
+    if (!Array.isArray(familyData)) {
+      return familyData;
+    }
+
+    return familyData.map(person => {
+      if (person.data && person.data.avatar) {
+        const normalizedPerson = JSON.parse(JSON.stringify(person)); // Deep copy
+        normalizedPerson.data.avatar = this.normalizeAvatarUrl(person.data.avatar);
+        return normalizedPerson;
+      }
+      return person;
+    });
   }
 
   // Add enhanced card styling via CSS

@@ -239,6 +239,13 @@ class FamilyTreeAPI {
       }
       
       if (treeData && Array.isArray(treeData) && treeData.length > 0) {
+        // Normalize avatar URLs if familyTreeManager is available
+        if (window.familyTreeManager && typeof window.familyTreeManager.normalizeAvatarUrlsInData === 'function') {
+          console.log('🔄 Normalizing avatar URLs in loaded data...');
+          treeData = window.familyTreeManager.normalizeAvatarUrlsInData(treeData);
+          console.log('✅ Avatar URLs normalized in loaded data');
+        }
+        
         // Load existing data
         console.log(`📖 Loaded ${treeId} with ${treeData.length} people`);
         
