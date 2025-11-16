@@ -1,0 +1,42 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build:vercel",
+  "outputDirectory": "dist",
+  "routes": [
+    {
+      "src": "/trees/(.*)",
+      "dest": "/trees/$1"
+    },
+    {
+      "src": "/js/(.*)",
+      "dest": "/js/$1"
+    },
+    {
+      "src": "/src/(.*)",
+      "dest": "/src/$1"
+    },
+    {
+      "src": "/backend/data/(.*)",
+      "dest": "/backend/data/$1"
+    },
+    {
+      "src": "/backend/images/(.*)",
+      "dest": "/backend/images/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)\\.(json|js|css|html)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    }
+  ]
+}

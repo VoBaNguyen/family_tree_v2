@@ -42,6 +42,7 @@
   ],
   "scripts": {
     "build": "node build.js",
+    "build:vercel": "node vercel-build.js",
     "test": "cypress open",
     "test-run": "cypress run",
     "dev": "vite",
