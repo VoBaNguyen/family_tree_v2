@@ -669,6 +669,11 @@ export class FamilyTreeManager {
     }
   }
 
+  // Upload avatar API (alias for external use)
+  async uploadAvatar(file) {
+    return this.uploadAvatarToServer(file);
+  }
+
   // Helper function to ensure avatar is on server before saving
   async ensureAvatarUploaded(personData) {
     // Validate input

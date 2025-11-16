@@ -958,3 +958,86 @@
   margin-top: 5px;
   margin-bottom: 5px;
 }
+
+/* Avatar upload styling */
+.f3 .avatar-upload-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  border: 2px dashed var(--card-border);
+  border-radius: 12px;
+  background: var(--card-bg);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.f3 .avatar-upload-container:hover {
+  border-color: var(--primary-color);
+  background: rgba(52, 152, 219, 0.1);
+  transform: translateY(-2px);
+}
+
+.f3 .avatar-upload-btn {
+  background: linear-gradient(135deg, var(--primary-color), #3498db);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+.f3 .avatar-upload-btn:hover {
+  background: linear-gradient(135deg, #2980b9, #3498db);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
+
+.f3 .avatar-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.f3 .avatar-preview img {
+  border: 3px solid var(--primary-color);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.f3 .avatar-preview img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+}
+
+.f3 .avatar-upload-container input[type="text"] {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 15px;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text-color);
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.f3 .avatar-upload-container input[type="text"]:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  outline: none;
+}
+
+.f3 .avatar-upload-container input[type="text"]::placeholder {
+  color: rgba(230, 230, 230, 0.6);
+  font-style: italic;
+}
+
+/* card-html */

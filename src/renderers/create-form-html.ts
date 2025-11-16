@@ -17,6 +17,8 @@ export function getHtmlNew(form_creator: NewRelFormCreator) {
       </div>
 
       ${form_creator.linkExistingRelative ? addLinkExistingRelative(form_creator) : ''}
+      
+      ${avatarUploadScript()}
     </form>
   `)
 }
@@ -47,6 +49,8 @@ export function getHtmlEdit(form_creator: EditDatumFormCreator) {
       <hr>
 
       ${removeRelativeBtn(form_creator)}
+      
+      ${avatarUploadScript()}
     </form>
   `)
 
@@ -104,7 +108,32 @@ function fields(form_creator: EditDatumFormCreator | NewRelFormCreator) {
   if (!form_creator.editable) return infoField()
   let fields_html = ''
   form_creator.fields.forEach(field => {
-    if (field.type === 'text') {
+    if (field.type === 'text' && field.id === 'avatar') {
+      // Special handling for avatar field
+      fields_html += `
+      <div class="f3-form-field">
+        <label>${field.label}</label>
+        <div class="avatar-upload-container">
+          ${field.initial_value ? `
+            <div class="avatar-preview">
+              <img src="${field.initial_value}" alt="Avatar preview" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 8px;">
+            </div>` : ''}
+          <input type="file" 
+            id="avatar-file-input" 
+            accept="image/*" 
+            style="display: none;">
+          <button type="button" class="avatar-upload-btn" onclick="document.getElementById('avatar-file-input').click()">
+            ${field.initial_value ? 'Change Avatar' : 'Upload Avatar'}
+          </button>
+          <input type="text" 
+            name="${field.id}" 
+            id="avatar-url-input"
+            value="${field.initial_value || ''}"
+            placeholder="Or paste image URL"
+            style="margin-top: 8px;">
+        </div>
+      </div>`
+    } else if (field.type === 'text') {
       fields_html += `
       <div class="f3-form-field">
         <label>${field.label}</label>
@@ -202,4 +231,85 @@ function closeBtn() {
 
 function spaceDiv() {
   return `<div style="height: 24px;"></div>`
+}
+
+function avatarUploadScript() {
+  return `
+    <script>
+      (function() {
+        const fileInput = document.getElementById('avatar-file-input');
+        const urlInput = document.getElementById('avatar-url-input');
+        
+        if (fileInput) {
+          fileInput.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+              alert('Please select a valid image file');
+              return;
+            }
+            
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+              alert('File size must be less than 5MB');
+              return;
+            }
+            
+            try {
+              // Create a preview
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                updateAvatarPreview(e.target.result);
+              };
+              reader.readAsDataURL(file);
+              
+              // Upload to server if backend is available
+              if (window.familyTreeManager && typeof window.familyTreeManager.uploadAvatar === 'function') {
+                const uploadedUrl = await window.familyTreeManager.uploadAvatar(file);
+                urlInput.value = uploadedUrl;
+                updateAvatarPreview(uploadedUrl);
+              } else {
+                // Use local file URL as fallback
+                const localUrl = URL.createObjectURL(file);
+                urlInput.value = localUrl;
+                updateAvatarPreview(localUrl);
+              }
+            } catch (error) {
+              console.error('Avatar upload failed:', error);
+              alert('Failed to upload avatar. Please try again.');
+            }
+          });
+        }
+        
+        if (urlInput) {
+          urlInput.addEventListener('input', function(e) {
+            const url = e.target.value;
+            if (url) {
+              updateAvatarPreview(url);
+            }
+          });
+        }
+        
+        function updateAvatarPreview(src) {
+          const container = document.querySelector('.avatar-upload-container');
+          let preview = container.querySelector('.avatar-preview');
+          
+          if (!preview) {
+            preview = document.createElement('div');
+            preview.className = 'avatar-preview';
+            container.insertBefore(preview, container.firstChild);
+          }
+          
+          preview.innerHTML = '<img src="' + src + '" alt="Avatar preview" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 8px;">';
+          
+          // Update button text
+          const btn = container.querySelector('.avatar-upload-btn');
+          if (btn) {
+            btn.textContent = 'Change Avatar';
+          }
+        }
+      })();
+    </script>`;
 }

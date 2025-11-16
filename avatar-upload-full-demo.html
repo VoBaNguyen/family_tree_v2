@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Family Tree - Full Avatar Upload with Backend</title>
+  <script src="https://unpkg.com/d3@7"></script>
+  <script src="js/family-tree-shared.js"></script>
+  <link rel="stylesheet" href="src/styles/family-chart.css">
+  <style> 
+    body { 
+      font-family: 'Arial', sans-serif; 
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+      color: #fff;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .instructions {
+      background: rgba(52, 152, 219, 0.1);
+      border-left: 4px solid #3498db;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 5px;
+    }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      text-align: center;
+    }
+    .status.success {
+      background: rgba(76, 175, 80, 0.2);
+      border: 1px solid #4CAF50;
+      color: #4CAF50;
+    }
+    .status.error {
+      background: rgba(244, 67, 54, 0.2);
+      border: 1px solid #f44336;
+      color: #f44336;
+    }
+    .controls {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .btn {
+      background: linear-gradient(135deg, #3498db, #2980b9);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+      font-weight: bold;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🌳 Family Tree - Full Avatar Upload Demo</h1>
+    <div class="instructions">
+      <strong>🚀 Complete Avatar Upload System:</strong>
+      <p>This demo shows the full avatar upload functionality with backend integration.</p>
+      <ul>
+        <li>✅ <strong>Beautiful Upload UI:</strong> Styled container with hover effects</li>
+        <li>✅ <strong>File Upload:</strong> Click upload button to select images</li>
+        <li>✅ <strong>URL Support:</strong> Paste image URLs directly</li>
+        <li>✅ <strong>Live Preview:</strong> See avatar immediately after selection</li>
+        <li>✅ <strong>Server Integration:</strong> Uploads to backend when available</li>
+        <li>✅ <strong>Offline Fallback:</strong> Works without backend too</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="status" class="status" style="display: none;"></div>
+
+  <div class="controls">
+    <button class="btn" onclick="checkBackend()">🔍 Check Backend Status</button>
+    <button class="btn" onclick="loadSampleData()">📂 Load Sample Data</button>
+    <button class="btn" onclick="exportData()">💾 Export Tree Data</button>
+  </div>
+
+  <div id="FamilyChart" class="f3" style="width:100%;height:700px;margin:auto;background-color:rgb(18,18,18);"></div>
+
+  <script type="module">
+    import f3 from 'src/index.js'
+
+    let familyTreeManager;
+    let f3Chart;
+
+    // Initialize the family tree with backend integration
+    async function initializeTree() {
+      try {
+        // Initialize the FamilyTreeManager for backend integration
+        familyTreeManager = new FamilyTreeManager('demo-tree');
+        
+        // Make it globally available for avatar upload
+        window.familyTreeManager = familyTreeManager;
+        
+        // Check if backend is available
+        const isBackendAvailable = await checkBackendAvailability();
+        
+        // Load existing data or create sample data
+        let data;
+        try {
+          data = await familyTreeManager.loadTree();
+          showStatus('✅ Loaded existing tree data from backend', 'success');
+        } catch (error) {
+          console.log('No existing data found, creating sample data');
+          data = getSampleData();
+          showStatus('📝 Created sample data (backend not available)', 'error');
+        }
+        
+        createChart(data);
+        
+      } catch (error) {
+        console.error('Initialization error:', error);
+        createChart(getSampleData());
+        showStatus('⚠️ Running in offline mode - avatar uploads will be local only', 'error');
+      }
+    }
+
+    function createChart(data) {
+      const cont = document.querySelector("#FamilyChart");
+      f3Chart = f3.createChart(cont, data);
+
+      // Enable editing with avatar upload
+      const editTree = f3Chart.editTree()
+        .setFields([
+          {type: 'text', label: 'First Name', id: 'first name'},
+          {type: 'text', label: 'Last Name', id: 'last name'},
+          {type: 'text', label: 'Birthday', id: 'birthday'},
+          {type: 'text', label: 'Avatar', id: 'avatar'}  // This enables avatar upload UI
+        ])
+        .setOnChange(async (updatedData) => {
+          console.log('Tree updated:', updatedData);
+          
+          // Save to backend if available
+          if (familyTreeManager) {
+            try {
+              await familyTreeManager.saveTree(updatedData);
+              showStatus('💾 Tree saved to backend successfully', 'success');
+            } catch (error) {
+              console.error('Failed to save to backend:', error);
+              showStatus('⚠️ Failed to save to backend - changes are local only', 'error');
+            }
+          }
+        });
+
+      showStatus('🎉 Family Tree with Avatar Upload is ready! Click any person card to edit.', 'success');
+    }
+
+    function getSampleData() {
+      return [
+        {
+          id: 'person1',
+          data: {
+            'first name': 'John',
+            'last name': 'Doe',
+            'birthday': '1970-01-15',
+            'avatar': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+            'gender': 'M'
+          }
+        },
+        {
+          id: 'person2', 
+          data: {
+            'first name': 'Jane',
+            'last name': 'Doe',
+            'birthday': '1975-06-20',
+            'avatar': 'https://images.unsplash.com/photo-1494790108755-2616b9ad1532?w=150&h=150&fit=crop&crop=face',
+            'gender': 'F'
+          },
+          rels: {
+            spouses: ['person1']
+          }
+        },
+        {
+          id: 'person3',
+          data: {
+            'first name': 'Michael',
+            'last name': 'Doe', 
+            'birthday': '2000-03-10',
+            'avatar': '',
+            'gender': 'M'
+          },
+          rels: {
+            mother: 'person2',
+            father: 'person1'
+          }
+        },
+        {
+          id: 'person4',
+          data: {
+            'first name': 'Emily',
+            'last name': 'Doe',
+            'birthday': '2005-09-15', 
+            'avatar': '',
+            'gender': 'F'
+          },
+          rels: {
+            mother: 'person2',
+            father: 'person1'
+          }
+        }
+      ];
+    }
+
+    async function checkBackendAvailability() {
+      try {
+        const response = await fetch('http://localhost:3001/api/health');
+        return response.ok;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function showStatus(message, type) {
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = message;
+      statusEl.className = `status ${type}`;
+      statusEl.style.display = 'block';
+      setTimeout(() => {
+        statusEl.style.display = 'none';
+      }, 5000);
+    }
+
+    // Global functions for buttons
+    window.checkBackend = async function() {
+      const isAvailable = await checkBackendAvailability();
+      if (isAvailable) {
+        showStatus('✅ Backend server is running on http://localhost:3001', 'success');
+      } else {
+        showStatus('❌ Backend server is not available. Run start-backend.bat to enable server features.', 'error');
+      }
+    };
+
+    window.loadSampleData = function() {
+      createChart(getSampleData());
+      showStatus('📂 Sample data loaded', 'success');
+    };
+
+    window.exportData = function() {
+      if (f3Chart && f3Chart.editTree) {
+        const data = f3Chart.editTree().exportData();
+        console.log('Exported data:', data);
+        
+        // Download as JSON file
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'family-tree-data.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        showStatus('💾 Tree data exported to file', 'success');
+      }
+    };
+
+    // Initialize on page load
+    initializeTree();
+  </script>
+</body>
+</html>
