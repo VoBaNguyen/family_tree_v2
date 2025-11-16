@@ -130,8 +130,13 @@ class FamilyTreeAPI {
           
           // Ensure avatars are uploaded to server before saving
           if (window.familyTreeManager && typeof window.familyTreeManager.ensureAvatarUploaded === 'function') {
-            for (const person of treeData) {
-              await window.familyTreeManager.ensureAvatarUploaded(person);
+            // Validate that treeData is an array before iterating
+            if (Array.isArray(treeData)) {
+              for (const person of treeData) {
+                await window.familyTreeManager.ensureAvatarUploaded(person);
+              }
+            } else {
+              console.warn('⚠️ treeData is not an array:', typeof treeData, treeData);
             }
           }
           
@@ -191,8 +196,13 @@ class FamilyTreeAPI {
       
       // Ensure avatars are uploaded to server before saving
       if (window.familyTreeManager && typeof window.familyTreeManager.ensureAvatarUploaded === 'function') {
-        for (const person of treeData) {
-          await window.familyTreeManager.ensureAvatarUploaded(person);
+        // Validate that treeData is an array before iterating
+        if (Array.isArray(treeData)) {
+          for (const person of treeData) {
+            await window.familyTreeManager.ensureAvatarUploaded(person);
+          }
+        } else {
+          console.warn('⚠️ treeData is not an array:', typeof treeData, treeData);
         }
       }
       
@@ -216,13 +226,35 @@ class FamilyTreeAPI {
     try {
       const response = await this.loadTree(treeId);
       
-      if (response.data && response.data.length > 0) {
+      console.log(`🔍 LoadAndInitialize response:`, response);
+      
+      // Validate response structure
+      let treeData = null;
+      if (response && response.data) {
+        treeData = response.data;
+      } else if (Array.isArray(response)) {
+        treeData = response;
+      } else {
+        console.log(`📄 ${treeId} has no valid data structure`);
+      }
+      
+      if (treeData && Array.isArray(treeData) && treeData.length > 0) {
         // Load existing data
-        console.log(`📖 Loaded ${treeId} with ${response.data.length} people`);
+        console.log(`📖 Loaded ${treeId} with ${treeData.length} people`);
         
         // Update the chart data
-        f3Chart.setData(response.data);
-        f3Chart.updateTree({ initial: true });
+        if (typeof f3Chart.setData === 'function') {
+          f3Chart.setData(treeData);
+        } else if (typeof f3Chart.updateData === 'function') {
+          f3Chart.updateData(treeData);
+        } else {
+          console.error('❌ f3Chart has no setData or updateData method');
+          throw new Error('Chart does not support data updates');
+        }
+        
+        if (typeof f3Chart.updateTree === 'function') {
+          f3Chart.updateTree({ initial: true });
+        }
         
         this.showSaveStatus('Tree loaded', 'success');
       } else {

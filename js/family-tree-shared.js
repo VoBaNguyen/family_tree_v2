@@ -114,7 +114,23 @@ export class FamilyTreeManager {
     if (manualSaveBtn) {
       manualSaveBtn.addEventListener('click', async () => {
         try {
-          const data = this.f3EditTree.getData();
+          // Check if f3EditTree is initialized
+          if (!this.f3EditTree) {
+            throw new Error('Edit tree not initialized yet');
+          }
+
+          // Try getData first, fallback to exportData
+          let data;
+          if (typeof this.f3EditTree.getData === 'function') {
+            data = this.f3EditTree.getData();
+          } else if (typeof this.f3EditTree.exportData === 'function') {
+            data = this.f3EditTree.exportData();
+          } else {
+            throw new Error('No data export method available on f3EditTree');
+          }
+
+          console.log('📊 Manual save data:', data);
+          
           const result = await this.treeAPI.saveTree(this.treeId, data, {
             familyName: familyName,
             savedAt: new Date().toISOString(),
@@ -180,7 +196,18 @@ export class FamilyTreeManager {
           console.log(`📡 Initial data response status: ${response.status} ${response.statusText}`);
           
           if (response.ok) {
-            this.familyData = await response.json();
+            const loadedData = await response.json();
+            
+            // Ensure loaded data is an array
+            if (Array.isArray(loadedData)) {
+              this.familyData = loadedData;
+            } else if (loadedData && typeof loadedData === 'object' && Array.isArray(loadedData.data)) {
+              this.familyData = loadedData.data;
+            } else {
+              console.error('❌ Loaded data is not in expected format:', typeof loadedData, loadedData);
+              this.familyData = [];
+            }
+            
             console.log(`📥 Loaded initial ${this.treeId} data with ${this.familyData.length} people`);
             
             if (this.familyData.length === 0) {
@@ -188,16 +215,31 @@ export class FamilyTreeManager {
             }
           } else {
             console.error(`❌ Initial data request failed: ${response.status} ${response.statusText}`);
+            this.familyData = []; // Ensure it's an empty array
           }
         } catch (error) {
           console.warn('Failed to load initial data from server:', error);
+          this.familyData = []; // Ensure it's an empty array
         }
       } else {
         console.log(`📋 ${this.treeId} already has ${this.familyData.length} people in familyData`);
+        
+        // Double-check that existing familyData is an array
+        if (!Array.isArray(this.familyData)) {
+          console.error('❌ Existing familyData is not an array:', typeof this.familyData, this.familyData);
+          this.familyData = [];
+        }
       }
       
       // Create the family chart
       console.log('🔧 Creating f3Chart with:', { f3, familyDataLength: this.familyData?.length });
+      console.log('🔍 familyData content:', this.familyData);
+      
+      // Validate familyData before creating chart
+      if (!Array.isArray(this.familyData)) {
+        console.error('❌ familyData is not an array:', typeof this.familyData, this.familyData);
+        throw new Error(`familyData must be an array, got ${typeof this.familyData}`);
+      }
       
       try {
         this.f3Chart = f3.createChart('#FamilyChart', this.familyData)
@@ -209,6 +251,7 @@ export class FamilyTreeManager {
         console.log('📊 Available methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(this.f3Chart)));
       } catch (chartError) {
         console.error('❌ Failed to create f3Chart:', chartError);
+        console.error('📊 familyData at error:', this.familyData);
         throw new Error(`Failed to create family chart: ${chartError.message}`);
       }
 
@@ -405,7 +448,7 @@ export class FamilyTreeManager {
 
     // Create main upload button
     const uploadBtn = document.createElement('button');
-    uploadBtn.textContent = '� Upload Avatar';
+    uploadBtn.textContent = 'Upload Avatar';
     uploadBtn.type = 'button';
     uploadBtn.style.cssText = `
       padding: 8px 16px;
@@ -571,7 +614,7 @@ export class FamilyTreeManager {
         statusIndicator.textContent = `Upload failed: ${error.message}`;
         statusIndicator.style.color = 'var(--error-color, #ef5350)';
       } finally {
-        uploadBtn.textContent = '� Upload Avatar';
+        uploadBtn.textContent = 'Upload Avatar';
         uploadBtn.disabled = false;
         uploadBtn.style.opacity = '1';
         fileInput.value = ''; // Reset file input
@@ -600,12 +643,20 @@ export class FamilyTreeManager {
 
   // Helper function to ensure avatar is on server before saving
   async ensureAvatarUploaded(personData) {
-    if (!personData.avatar || !personData.avatar.trim()) {
+    // Validate input
+    if (!personData || typeof personData !== 'object') {
+      console.warn('⚠️ ensureAvatarUploaded: invalid personData:', typeof personData, personData);
+      return personData;
+    }
+
+    // Check if person has data property and avatar field
+    const data = personData.data || personData;
+    if (!data.avatar || !data.avatar.trim()) {
       return personData; // No avatar to check
     }
 
     // Check if avatar is a local file (data URL or blob URL)
-    const avatarUrl = personData.avatar.trim();
+    const avatarUrl = data.avatar.trim();
     if (avatarUrl.startsWith('data:') || avatarUrl.startsWith('blob:')) {
       console.log('🔄 Detected local avatar image, uploading to server...');
       
@@ -627,7 +678,11 @@ export class FamilyTreeManager {
         const serverUrl = await this.uploadAvatarToServer(file);
         
         // Update the person data with the server URL
-        personData.avatar = serverUrl;
+        if (personData.data) {
+          personData.data.avatar = serverUrl;
+        } else {
+          personData.avatar = serverUrl;
+        }
         console.log('✅ Avatar uploaded to server:', serverUrl);
         
         // Update the input field if it exists

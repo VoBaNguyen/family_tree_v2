@@ -1,0 +1,9 @@
+This should be a default user avatar image file (user.png).
+You can replace this file with an actual PNG image file.
+
+Recommended image specifications:
+- Size: 80x80 pixels or larger
+- Format: PNG with transparency
+- Content: Simple user silhouette or person icon
+
+This image will be used as the default avatar when no avatar is specified for a family member.

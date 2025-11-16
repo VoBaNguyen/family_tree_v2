@@ -217,10 +217,11 @@ let familyData = [];
 
 // Initialize tree manager and setup
 const manager = new FamilyTreeManager(TREE_ID, familyData, treeAPI);
-manager.setupEventHandlers('Me Na Family');
 
-// Make manager globally available for persistence API
+// Make manager globally available for persistence API BEFORE setup
 window.familyTreeManager = manager;
+
+manager.setupEventHandlers('Me Na Family');
 
 // Initialize the tree with error handling
 async function initializeTree() {

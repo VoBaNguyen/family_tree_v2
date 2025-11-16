@@ -471,7 +471,7 @@
       "id": "15",
       "data": {
         "first name": "Tuấn",
-        "last name": "Hello",
+        "last name": "hello",
         "gender": "M",
         "sex": "",
         "title": "",
@@ -619,7 +619,7 @@
         "last name": "Nguyên",
         "gender": "M",
         "note": "Current user",
-        "avatar": "../images/ba-na/29.jpg",
+        "avatar": "../images/ba-na/user.png",
         "birthday": "09/07/1996"
       },
       "rels": {
@@ -631,7 +631,7 @@
     }
   ],
   "metadata": {
-    "autoSavedAt": "2025-11-16T07:00:51.175Z"
+    "autoSavedAt": "2025-11-16T07:13:12.368Z"
   },
-  "lastModified": "2025-11-16T07:00:51.175Z"
+  "lastModified": "2025-11-16T07:13:12.368Z"
 }
