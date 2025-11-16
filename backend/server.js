@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import multer from 'multer';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -18,13 +19,55 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Data directories
 const DATA_DIR = path.join(__dirname, 'data');
 const BACKUP_DIR = path.join(__dirname, 'backups');
+const IMAGES_DIR = path.join(__dirname, 'images');
+
+// Configure multer for image uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const treeId = req.params.treeId || 'general';
+    const uploadDir = path.join(IMAGES_DIR, treeId);
+    fs.mkdir(uploadDir, { recursive: true }).then(() => {
+      cb(null, uploadDir);
+    }).catch(err => {
+      console.error('Error creating upload directory:', err);
+      cb(err);
+    });
+  },
+  filename: function (req, file, cb) {
+    const timestamp = Date.now();
+    const ext = path.extname(file.originalname);
+    const name = path.basename(file.originalname, ext).replace(/[^a-zA-Z0-9]/g, '-');
+    cb(null, `${name}-${timestamp}${ext}`);
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: function (req, file, cb) {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'));
+    }
+  }
+});
+
+// Serve static images
+app.use('/images', express.static(IMAGES_DIR));
 
 // Ensure directories exist
 async function ensureDirectories() {
   try {
     await fs.mkdir(DATA_DIR, { recursive: true });
     await fs.mkdir(BACKUP_DIR, { recursive: true });
-    console.log('✓ Data directories ensured');
+    await fs.mkdir(IMAGES_DIR, { recursive: true });
+    
+    // Create tree-specific image directories
+    await fs.mkdir(path.join(IMAGES_DIR, 'BaNa'), { recursive: true });
+    await fs.mkdir(path.join(IMAGES_DIR, 'MeNa'), { recursive: true });
+    
+    console.log('✓ Data and image directories ensured');
   } catch (error) {
     console.error('Error creating directories:', error);
   }
@@ -171,7 +214,7 @@ app.get('/api/trees/:treeId', async (req, res) => {
   }
 });
 
-// Save tree data with backup
+// Save tree data with backup and image cleanup
 app.post('/api/trees/:treeId', async (req, res) => {
   const { treeId } = req.params;
   const { data, metadata = {} } = req.body;
@@ -181,25 +224,28 @@ app.post('/api/trees/:treeId', async (req, res) => {
 
   try {
     // Create backup of existing file if it exists
+    let backupCreated = false;
     try {
       const existingContent = await fs.readFile(filePath, 'utf-8');
       const backupPath = path.join(BACKUP_DIR, `${treeId}_${timestamp}.json`);
       await fs.writeFile(backupPath, existingContent);
       console.log(`📦 Created backup: ${treeId}_${timestamp}.json`);
+      backupCreated = true;
     } catch (backupError) {
       if (backupError.code !== 'ENOENT') {
         console.warn('Warning: Could not create backup:', backupError.message);
       }
     }
 
-    // Save new data
+    // Save new data with enhanced metadata
     const saveData = {
       treeId,
       data,
       metadata: {
         ...metadata,
         savedAt: new Date().toISOString(),
-        version: (metadata.version || 0) + 1
+        version: (metadata.version || 0) + 1,
+        imageCount: data ? data.filter(person => person.avatar).length : 0
       },
       lastModified: new Date().toISOString()
     };
@@ -209,7 +255,7 @@ app.post('/api/trees/:treeId', async (req, res) => {
     // Clean old backups
     await cleanOldBackups(treeId);
 
-    console.log(`💾 Saved tree: ${treeId} (${data?.length || 0} people)`);
+    console.log(`💾 Saved tree: ${treeId} (${data?.length || 0} people, ${saveData.metadata.imageCount} with avatars)`);
     
     res.json({
       success: true,
@@ -217,7 +263,7 @@ app.post('/api/trees/:treeId', async (req, res) => {
       message: 'Tree saved successfully',
       metadata: saveData.metadata,
       lastModified: saveData.lastModified,
-      backupCreated: true
+      backupCreated
     });
 
   } catch (error) {
@@ -431,6 +477,128 @@ app.post('/api/trees/:treeId/restore/:backupFilename', async (req, res) => {
       res.status(500).json({
         success: false,
         error: 'Failed to restore from backup',
+        message: error.message
+      });
+    }
+  }
+});
+
+// Image management API endpoints
+
+// Upload avatar image
+app.post('/api/images/:treeId/upload', upload.single('avatar'), async (req, res) => {
+  const { treeId } = req.params;
+  
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: 'No image file provided'
+      });
+    }
+
+    const imageUrl = `/images/${treeId}/${req.file.filename}`;
+    
+    console.log(`📸 Uploaded avatar for ${treeId}: ${req.file.filename}`);
+    
+    res.json({
+      success: true,
+      imageUrl,
+      filename: req.file.filename,
+      originalName: req.file.originalname,
+      size: req.file.size
+    });
+
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to upload image',
+      message: error.message
+    });
+  }
+});
+
+// List images for a tree
+app.get('/api/images/:treeId', async (req, res) => {
+  const { treeId } = req.params;
+  const imagesDir = path.join(IMAGES_DIR, treeId);
+
+  try {
+    try {
+      const files = await fs.readdir(imagesDir);
+      const imageFiles = files
+        .filter(file => /\.(jpg|jpeg|png|gif|webp)$/i.test(file))
+        .map(file => ({
+          filename: file,
+          url: `/images/${treeId}/${file}`,
+          path: path.join(imagesDir, file)
+        }));
+
+      res.json({
+        success: true,
+        images: imageFiles,
+        count: imageFiles.length
+      });
+
+    } catch (dirError) {
+      if (dirError.code === 'ENOENT') {
+        // Directory doesn't exist, return empty array
+        res.json({
+          success: true,
+          images: [],
+          count: 0
+        });
+      } else {
+        throw dirError;
+      }
+    }
+
+  } catch (error) {
+    console.error('Error listing images:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to list images',
+      message: error.message
+    });
+  }
+});
+
+// Delete image
+app.delete('/api/images/:treeId/:filename', async (req, res) => {
+  const { treeId, filename } = req.params;
+  const imagePath = path.join(IMAGES_DIR, treeId, filename);
+
+  try {
+    // Security check - ensure filename doesn't contain path traversal
+    if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid filename'
+      });
+    }
+
+    await fs.unlink(imagePath);
+    
+    console.log(`🗑️ Deleted image for ${treeId}: ${filename}`);
+    
+    res.json({
+      success: true,
+      message: 'Image deleted successfully',
+      filename
+    });
+
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      res.status(404).json({
+        success: false,
+        error: 'Image not found'
+      });
+    } else {
+      console.error('Error deleting image:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to delete image',
         message: error.message
       });
     }

@@ -43,6 +43,28 @@ if not exist "backend\backups" (
     echo ✓ Backups directory already exists
 )
 
+REM Create image directories
+if not exist "backend\images" (
+    mkdir "backend\images"
+    echo ✓ Created images directory
+) else (
+    echo ✓ Images directory already exists
+)
+
+if not exist "backend\images\BaNa" (
+    mkdir "backend\images\BaNa"
+    echo ✓ Created BaNa images directory
+) else (
+    echo ✓ BaNa images directory already exists
+)
+
+if not exist "backend\images\MeNa" (
+    mkdir "backend\images\MeNa"
+    echo ✓ Created MeNa images directory
+) else (
+    echo ✓ MeNa images directory already exists
+)
+
 REM Install dependencies
 echo.
 echo 📦 Installing dependencies...
@@ -68,8 +90,12 @@ echo   - Save tree: POST /api/trees/{id}
 echo   - Auto-save: PUT /api/trees/{id}/autosave
 echo   - Get backups: GET /api/trees/{id}/backups
 echo   - Restore backup: POST /api/trees/{id}/restore/{backup}
+echo   - Upload image: POST /api/images/{treeId}/upload
+echo   - List images: GET /api/images/{treeId}
+echo   - Delete image: DELETE /api/images/{treeId}/{filename}
+echo   - Serve images: GET /images/{treeId}/{filename}
 echo.
 echo Press Ctrl+C to stop the server
 echo ==============================
 
-node server.js
+node "%~dp0backend\server.js"
