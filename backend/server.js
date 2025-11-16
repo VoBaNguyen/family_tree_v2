@@ -126,12 +126,29 @@ app.get('/api/trees/:treeId', async (req, res) => {
     const fileContent = await fs.readFile(filePath, 'utf-8');
     const treeData = JSON.parse(fileContent);
     
+    // Handle both structures: 
+    // 1. Raw array (initial data): [{id: "1", ...}, ...]
+    // 2. Wrapped structure: {data: [...], metadata: {}, lastModified: "..."}
+    let data, metadata, lastModified;
+    
+    if (Array.isArray(treeData)) {
+      // Raw array format (initial data)
+      data = treeData;
+      metadata = {};
+      lastModified = null;
+    } else {
+      // Wrapped structure format (saved data)
+      data = treeData.data || [];
+      metadata = treeData.metadata || {};
+      lastModified = treeData.lastModified;
+    }
+    
     res.json({
       success: true,
       treeId,
-      data: treeData.data || [],
-      metadata: treeData.metadata || {},
-      lastModified: treeData.lastModified
+      data,
+      metadata,
+      lastModified
     });
   } catch (error) {
     if (error.code === 'ENOENT') {

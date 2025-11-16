@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Debug Family Tree Loading</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+    .success { background: #d4edda; border-color: #c3e6cb; }
+    .error { background: #f8d7da; border-color: #f5c6cb; }
+    .info { background: #d1ecf1; border-color: #bee5eb; }
+    pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>Family Tree Data Loading Debug</h1>
+  <div id="results"></div>
+  
+  <script>
+    async function runTests() {
+      const results = document.getElementById('results');
+      let html = '';
+      
+      try {
+        // Test 1: Check server health
+        html += '<div class="test-section info"><h3>Test 1: Server Health Check</h3>';
+        const health = await fetch('http://localhost:3001/api/health');
+        const healthData = await health.json();
+        html += `<p>✅ Server is running: ${healthData.message}</p></div>`;
+        
+        // Test 2: Test initial data endpoints
+        html += '<div class="test-section info"><h3>Test 2: Initial Data Endpoints</h3>';
+        
+        const banaInitial = await fetch('http://localhost:3001/api/initial/BaNa');
+        const banaInitialData = await banaInitial.json();
+        html += `<p>✅ BaNa initial data: ${banaInitialData.length} people</p>`;
+        
+        const menaInitial = await fetch('http://localhost:3001/api/initial/MeNa');
+        const menaInitialData = await menaInitial.json();
+        html += `<p>✅ MeNa initial data: ${menaInitialData.length} people</p>`;
+        html += '</div>';
+        
+        // Test 3: Test regular tree endpoints
+        html += '<div class="test-section info"><h3>Test 3: Regular Tree Endpoints</h3>';
+        
+        const banaTree = await fetch('http://localhost:3001/api/trees/BaNa');
+        const banaTreeData = await banaTree.json();
+        html += `<p>✅ BaNa tree data: ${banaTreeData.data.length} people</p>`;
+        
+        const menaTree = await fetch('http://localhost:3001/api/trees/MeNa');
+        const menaTreeData = await menaTree.json();
+        html += `<p>✅ MeNa tree data: ${menaTreeData.data.length} people</p>`;
+        html += '</div>';
+        
+        // Test 4: Compare data consistency
+        html += '<div class="test-section info"><h3>Test 4: Data Consistency Check</h3>';
+        const banaMatch = banaInitialData.length === banaTreeData.data.length;
+        const menaMatch = menaInitialData.length === menaTreeData.data.length;
+        
+        html += banaMatch ? 
+          '<p>✅ BaNa: Initial and tree data counts match</p>' : 
+          '<p>❌ BaNa: Data count mismatch</p>';
+          
+        html += menaMatch ? 
+          '<p>✅ MeNa: Initial and tree data counts match</p>' : 
+          '<p>❌ MeNa: Data count mismatch</p>';
+        html += '</div>';
+        
+        // Test 5: Sample first person from each dataset
+        html += '<div class="test-section success"><h3>Test 5: Sample Data</h3>';
+        html += '<h4>BaNa First Person (Initial):</h4>';
+        html += `<pre>${JSON.stringify(banaInitialData[0], null, 2)}</pre>`;
+        html += '<h4>BaNa First Person (Tree):</h4>';
+        html += `<pre>${JSON.stringify(banaTreeData.data[0], null, 2)}</pre>`;
+        html += '</div>';
+        
+        // Test 6: Test importing modules
+        html += '<div class="test-section info"><h3>Test 6: Module Import Test</h3>';
+        try {
+          const f3Module = await import('./src/index.js');
+          html += '<p>✅ f3 module imported successfully</p>';
+          
+          const persistenceModule = await import('./js/persistence-api.js');
+          html += '<p>✅ persistence API module imported successfully</p>';
+          
+          const sharedModule = await import('./js/family-tree-shared.js');
+          html += '<p>✅ shared module imported successfully</p>';
+          
+          // Test creating components
+          const treeAPI = new persistenceModule.default();
+          const manager = new sharedModule.FamilyTreeManager('BaNa', [], treeAPI);
+          html += '<p>✅ FamilyTreeManager created successfully</p>';
+          
+        } catch (moduleError) {
+          html += `<p class="error">❌ Module error: ${moduleError.message}</p>`;
+        }
+        html += '</div>';
+        
+        // Test 7: Test full loading process
+        html += '<div class="test-section info"><h3>Test 7: Full Loading Process</h3>';
+        try {
+          // Simulate the BaNa loading process
+          let familyData = [];
+          
+          // Load initial data
+          const initialResponse = await fetch('http://localhost:3001/api/initial/BaNa');
+          if (initialResponse.ok) {
+            familyData = await initialResponse.json();
+            html += `<p>✅ Loaded ${familyData.length} people from initial data</p>`;
+            
+            if (familyData.length > 0) {
+              html += `<p>First person: ${familyData[0].data['first name']} ${familyData[0].data['last name']}</p>`;
+            }
+          }
+          
+          // Check if saved data exists
+          const savedResponse = await fetch('http://localhost:3001/api/trees/BaNa');
+          const savedData = await savedResponse.json();
+          html += `<p>Saved data check: success=${savedData.success}, count=${savedData.data ? savedData.data.length : 0}</p>`;
+          
+        } catch (loadError) {
+          html += `<p class="error">❌ Loading process error: ${loadError.message}</p>`;
+        }
+        html += '</div>';
+        
+      } catch (error) {
+        html += `<div class="test-section error"><h3>❌ Error</h3><p>${error.message}</p></div>`;
+      }
+      
+      results.innerHTML = html;
+    }
+    
+    // Run tests when page loads
+    window.addEventListener('load', runTests);
+  </script>
+</body>
+</html>

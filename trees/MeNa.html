@@ -108,7 +108,35 @@ let familyData = [];
 // Initialize tree manager and setup
 const manager = new FamilyTreeManager(TREE_ID, familyData, treeAPI);
 manager.setupEventHandlers('Me Na Family');
-manager.initializeTree(f3);
+
+// Initialize the tree with error handling
+async function initializeTree() {
+  try {
+    await manager.initializeTree(f3);
+    console.log('✅ MeNa family tree initialized successfully');
+  } catch (error) {
+    console.error('❌ Failed to initialize MeNa family tree:', error);
+    
+    // Show error message in the chart area
+    const chartElement = document.getElementById('FamilyChart');
+    if (chartElement) {
+      chartElement.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #fff; text-align: center;">
+          <div>
+            <h2>❌ Failed to Load Family Tree</h2>
+            <p>Error: ${error.message}</p>
+            <button onclick="location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+              Try Again
+            </button>
+          </div>
+        </div>
+      `;
+    }
+  }
+}
+
+// Start initialization
+initializeTree();
 
 </script>
 </body>
